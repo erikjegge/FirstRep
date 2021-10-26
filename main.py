@@ -24,10 +24,6 @@ class Globals:
                     'Bonus3':[],
                     'CamelToken':[]
         }
-        self.player1Hand = []
-        self.player2Hand = []
-        self.player1Pile = []
-        self.player2Pile = []
 
     def initialize_Deck(self):
         numberOfLuxuryGoods = 6
@@ -52,9 +48,6 @@ class Globals:
             self.deckOfCards.append(Card('Camel',False))
 
         random.shuffle(self.deckOfCards)
-
-        self.player_Take_Card(1,5)
-        self.player_Take_Card(2,5)
 
         for _ in range(3):
             self.deckOfCards.append(Card('Camel',False))
@@ -128,25 +121,9 @@ class Globals:
         return self.marketCards
 
     # which player 1 or two taking the cards
-    def player_Take_Card(self, player, number):
-        if player == 1:
-            for _ in range(number):
-                self.player1Hand.append(self.deckOfCards.pop())
-        elif player == 2:
-            for _ in range(number):
-                self.player2Hand.append(self.deckOfCards.pop())
-            
-    def get_Player1_Hand(self):
-        return self.player1Hand
-
-    def get_Player2_Hand(self):
-        return self.player2Hand
-
-    def get_Player1_Tokens(self):
-        return self.player1Pile
-
-    def get_Player2_Tokens(self):
-        return self.player2Pile
+    def deal_Cards(self, player, number):
+        for _ in range(number):
+            player.hand.append(self.deckOfCards.pop())
 
 class Card:
     def __init__(self, Type, Luxury):
@@ -168,43 +145,58 @@ class Token:
         return self.Type
 
     def get_Value(self):
-        return self.Value   
+        return self.Value 
+
+class Player: 
+    """
+        Each player has...
+            + a token pile (points)
+            + a hand of cards
+            + a farm of camels
+    """
+    def __init__(self, name, tokens, hand, farm):
+        self.name = name
+        self.tokens = tokens
+        self.hand = hand
+        self.farm = farm
+    
+    def get_Tokens(self):
+        return self.tokens
+
+    def get_Hand(self):
+        return self.hand
+
+    def get_Farm(self):
+        return self.farm
+
 
 def main():
-
     g = Globals()
     g.initialize_Deck()
     g.initialize_Tokens()
-
     g.draw_Cards(5)
+
+    p1 = Player("Player1",[],[],[])
+    p2 = Player("Player2",[],[],[])
     
-    for r in g.get_Market():
-        print(r.get_Type())
+    for r in p1.get_Hand():
+        print(r)
+
+    print('after 1')
+    g.deal_Cards(p1, 5)
+
+    for r in p1.get_Hand():
+        print(r)
 
     x = g.get_Token_Piles()
 
-    print(x.get('Leather'))
+    #print(x.get('Leather'))
 
-    for key in list(x):
-        print(key + ": " + str(len(x[key])))
-        # for r in x[key]:
-        #     print(r.get_Type() + ": " + str(r.get_Value()))     
-
-    print(g.get_Player1_Tokens())
-    g.deal_Token('Leather', 1)
-    print(g.get_Player1_Tokens())
-
-    for r in g.get_Player1_Tokens():
-
-        print(r.get_Type() + ": " + str(r.get_Value()))
-
-    # for key in list(tokenPiles.keys()):
-    #     #print(key)
-    #     for r in tokenPiles[key]:
-    #         print(r.get_Type() + ": " + str(r.get_Value()))
+    #for key in list(x):
+    #    print(key + ": " + str(len(x[key])))
 
 
-""" 
+"""
     on a turn you can do one of two things
 
     TAKE CARDS
@@ -215,7 +207,7 @@ def main():
 
     never both
 """
-def takeCards():
+def takeCards(playerHand, market):
     #1: take several goods, then replenish the market cards with a combination of camels and cards from your hand
 
     #2: take 1 good, then replace the marketcard with the top card of the deck
