@@ -7,32 +7,104 @@
 """
 from game import Globals
 from player import Player
+# from tkinter import *
+# from tkinter import messagebox
+
+def reset():
+    # will reset the screen and initalize new game
+    return True
 
 def main():
-    g = Globals()
-    g.initialize_Deck()
-    g.initialize_Tokens()
-    g.draw_Cards(5)
 
-    p1 = Player("Player1",[],[],[])
-    p2 = Player("Player2",[],[],[])
+    boolCont = True
+    while boolCont:
+        print('<><><><><><><><> JAIPUR <><><><><><><><>')
+        print('0.) Play')
+        print('1.) Quit')
+        
+        menuInput = input("Please enter an option from above\n")
+        if menuInput not in ('0','1'):
+            print('please enter valid input')
+        else:
+            boolCont = False
+            if menuInput == '1':
+                #close the program
+                quit()
+            else:
+                #go to game
+                #<><><><><><><><><><><><><><><><><><><><><><><><>
+                # # initializing gui using tkinter
+                # root = Tk()
+                # root.title("Jaipur")
+                # #root.iconbitmap()
+
+                # root.mainloop()
+                #<><><><><><><><><><><><><><><><><><><><><><><><>
+                g = Globals()
+                g.initialize_Deck()
+                g.initialize_Tokens()
+                g.draw_Cards(5)
+
+                p1 = Player("Player1",[],[],[])
+                p2 = Player("Player2",[],[],[])
+
+                g.deal_Cards(p1, 5)
+                g.deal_Cards(p2, 5)
+
+                # any camels that start in hand go to farm, for rest of game, they go directly to farm from display
+                for i, r in enumerate(p1.get_Hand()):
+                    if r.get_Type() == 'Camel':
+                        p1.farm.append(p1.hand.pop(i))
     
-    for r in p1.get_Hand():
-        print(r)
+                print("Market")
+                for r in g.get_Market():
+                    print(r.get_Type())
+                print("Player 1 Hand:")
+                for r in p1.get_Hand():
+                    print(r.get_Type())
+                print("Player 1 Farm:")
+                for r in p1.get_Farm():
+                    print(r.get_Type())
 
-    print('after 1')
-    g.deal_Cards(p1, 5)
+                print('<><><><><><><><> Player: Turn: <><><><><><><><>')
+                print('0.) Take Cards')
+                print('1.) Sell Cards')
+                gameInput = input("Please enter an option from above\n")
+                if gameInput not in ('0','1'):
+                    print('please enter valid input')
+                else:
+                   if gameInput == '0':
+                        #take cards
+                        print('<><><><><><><><> Take Cards Action <><><><><><><><>')
+                        print('0.) Take Several Goods')
+                        print('1.) Take One Good')
+                        print('2.) Take All Camels')
+                        gameInput = input("Please enter an option from above\n")
+                        if gameInput not in ('0','1','2'):
+                            print('please enter valid input')
+                        else:
+                            # move into 
+                            takeCards(p1, g, gameInput)
 
-    for r in p1.get_Hand():
-        print(r.get_Type())
-        print(r.display_Card())
+                print("Market")
+                for r in g.get_Market():
+                    print(r.get_Type())
+                print("Player 1 Hand:")
+                for r in p1.get_Hand():
+                    print(r.get_Type())
+                print("Player 1 Farm:")
+                for r in p1.get_Farm():
+                    print(r.get_Type())
 
-    #x = g.get_Token_Piles()
+                #    else:
+                        #sell cards
 
-    #print(x.get('Leather'))
+                #x = g.get_Token_Piles()
 
-    #for key in list(x):
-    #    print(key + ": " + str(len(x[key])))
+                #print(x.get('Leather'))
+
+                #for key in list(x):
+                #    print(key + ": " + str(len(x[key])))
 
 
 """
@@ -46,12 +118,28 @@ def main():
 
     never both
 """
-def takeCards(playerHand, market):
+def takeCards(player, game, option):
     #1: take several goods, then replenish the market cards with a combination of camels and cards from your hand
 
     #2: take 1 good, then replace the marketcard with the top card of the deck
 
     #3: take all the camels from the marketCards and then replace with cards from the top of the deck until there are 5
+    if option == '2':
+        # list comp for two seperate lists, one of just camels, one of everything else
+        camels = [i for i in game.get_Market() if i.get_Type() == 'Camel']
+        otherCards = [i for i in game.get_Market() if i.get_Type() != 'Camel']
+
+        # add the camels to the player's farm
+        player.add_To_Farm(camels)
+
+        # make the other card's the new market
+        game.reset_Market(otherCards)
+
+        # refill the market up to 5
+        refillCards = 5 - game.get_Market_Len()
+        if refillCards != 0:
+            game.draw_Cards(refillCards)
+
     return
 
 def sellCards():

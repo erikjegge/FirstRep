@@ -19,3 +19,6 @@ class Player:
 
     def get_Farm(self):
         return self.farm
+    
+    def add_To_Farm(self, list):
+        self.farm.extend(list)
