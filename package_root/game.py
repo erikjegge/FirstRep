@@ -121,5 +121,9 @@ class Globals:
     def deal_Cards(self, player, number):
         for _ in range(number):
             player.hand.append(self.deckOfCards.pop())
+    
+    # which will take a list and make that the new market 
+    def reset_Market(self, list):
+        self.marketCards = list
 
     
