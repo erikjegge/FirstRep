@@ -22,3 +22,7 @@ class Player:
     
     def add_To_Farm(self, list):
         self.farm.extend(list)
+    
+    # can be a list of one or many
+    def add_To_Hand(self, list):
+        self.hand.extend(list)

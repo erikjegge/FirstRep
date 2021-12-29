@@ -121,7 +121,33 @@ def main():
 def takeCards(player, game, option):
     #1: take several goods, then replenish the market cards with a combination of camels and cards from your hand
 
-    #2: take 1 good, then replace the marketcard with the top card of the deck
+    #2: take 1 good, then replace the marketcard with the top card of the deck (can't take just one camel)
+    if option == '1':
+        camels = [i for i in game.get_Market() if i.get_Type() == 'Camel']
+        goodCards = [i for i in game.get_Market() if i.get_Type() != 'Camel']
+
+        print('<><><><><><><><> Take One Card Action <><><><><><><><>')
+        options = []
+        for i, r in enumerate(goodCards):
+            print('%i.) %s' % (i, r.get_Type()))
+            options.append(str(i))
+
+        gameInput = input("Please enter an option from above\n")
+        if gameInput not in (options):
+            print('please enter valid input')
+        else:
+            # do the thing
+            cardsToAdd = []
+            cardsToAdd.append(goodCards.pop(int(gameInput)))
+            player.add_To_Hand(cardsToAdd)
+
+            # add the camels back in
+            goodCards.extend(camels)
+            # reset market
+            game.reset_Market(goodCards)
+
+            game.draw_Cards(1) # draw card from top of deck
+
 
     #3: take all the camels from the marketCards and then replace with cards from the top of the deck until there are 5
     if option == '2':
